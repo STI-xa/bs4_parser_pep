@@ -120,7 +120,7 @@ def pep(session):
         total_peps += 1
         data = list(find_tag(pep, 'abbr').text)
         preview_status = data[1:][0] if len(data) > 1 else ''
-        url = urljoin(PEP_URL, find_tag(pep, 'a', attrs={
+        url = urljoin(PEP_URL, find_tag(pep, 'a', {
             'class': 'pep reference internal'})['href'])
         response = get_response(session, url)
         soup = BeautifulSoup(response.text, 'lxml')
