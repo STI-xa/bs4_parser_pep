@@ -1,3 +1,4 @@
+from collections import defaultdict
 import logging
 import re
 from urllib.parse import urljoin
@@ -7,7 +8,7 @@ from bs4 import BeautifulSoup
 from tqdm import tqdm
 
 from configs import configure_argument_parser, configure_logging
-from constants import BASE_DIR, MAIN_DOC_URL, PEP_URL, EXPECTED_STATUS
+from constants import BASE_DIR, EXPECTED_STATUS, MAIN_DOC_URL, PEP_URL
 from outputs import control_output
 from utils import find_tag, get_response
 
@@ -111,7 +112,7 @@ def pep(session):
     tbody_tag = find_tag(section_tag, 'tbody')
     tr_tags = tbody_tag.find_all('tr')
 
-    status_sum = {}
+    status_sum = defaultdict(int)
     total_peps = 0
 
     results = [('Статус', 'Количество')]
@@ -128,10 +129,7 @@ def pep(session):
                               attrs={'class': 'rfc2822 field-list simple'})
         status_pep_page = table_info.find(
             string='Status').parent.find_next_sibling('dd').string
-        if status_pep_page in status_sum:
-            status_sum[status_pep_page] += 1
-        if status_pep_page not in status_sum:
-            status_sum[status_pep_page] = 1
+        status_sum[status_pep_page] += 1
         if status_pep_page not in EXPECTED_STATUS[preview_status]:
             error_message = (f'Несовпадающие статусы:\n'
                              f'Статус в карточке: {status_pep_page}\n'
